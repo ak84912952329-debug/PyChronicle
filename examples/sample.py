@@ -1,7 +1,7 @@
+x = 10
+y = 20
 
-x=10
-y=20
-z=x+y
-z=z*2
+total = x + y
+result = total * 2
 
-print(z)
+print("Final result:", result)
