@@ -1,8 +1,8 @@
 import unittest
 
-from ast_analyzer import ASTAnalyzer
-from history import History, ExecutionState
-from tracer import ExecutionTracer
+from pychronicle.ast_analyzer import ASTAnalyzer
+from pychronicle.history import History, ExecutionState
+from pychronicle.tracer import ExecutionTracer
 
 
 class TestASTAnalyzer(unittest.TestCase):
