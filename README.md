@@ -1,31 +1,27 @@
-## 📊 Mid-Review Progress
+# PyChronicle: AST-Powered Time-Travel Debugger
 
-### Completed
-- Project requirements and objectives identified
-- Project architecture designed
-- Python AST parsing implemented
-- Python execution tracing implemented
-- Variable state recording implemented
-- Execution history storage implemented
-- Sample Python program added
+PyChronicle is a Python debugging prototype that records program
+execution states and allows developers to inspect the execution history.
 
-### Currently Working On
-- Time-travel state navigation
-- Previous and Next execution-state inspection
-- Function and exception tracking
-- Improving the debugging interface
+## 🎯 Project Objective
 
-### Upcoming Work
-- Implement Jump-to-Step navigation
-- Add better handling of loops and functions
-- Add exception tracking
-- Improve memory and performance
-- Develop a simple user interface
-- Add comprehensive testing
-- Complete project documentation
+The main objective of PyChronicle is to make debugging easier by
+maintaining a history of program execution.
 
-### Current Status
+Instead of checking only the current state of a program, developers
+can inspect previously recorded execution states.
 
-**MVP / Prototype stage — under active development.**
+## 🏗️ Architecture
 
-The current prototype focuses on AST analysis, execution tracing, and recording program execution states for future time-travel debugging.
+```text
+Python Source Code
+        ↓
+   AST Analyzer
+        ↓
+Execution Tracer
+        ↓
+ State Recording
+        ↓
+ History Manager
+        ↓
+Previous / Next / Jump
