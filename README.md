@@ -14,7 +14,7 @@ can inspect previously recorded execution states.
 
 ### Execution Flow
 
-```text
+text
 Python Source Code
         ↓
     AST Analysis
@@ -34,11 +34,11 @@ Python Source Code
   Streamlit Interface
         ↓
 Step-by-Step Debugging
-'''
 
-####🏗️Architecture
 
-```text
+#### 🏗️Architecture
+
+text
                  👤 User
                     │
                     ▼
@@ -71,4 +71,3 @@ Step-by-Step Debugging
                     │
                     ▼
           🌐 Streamlit Interface
-'''
