@@ -3,12 +3,13 @@ from .tracer import ExecutionTracer
 
 
 class PyChronicle:
+
     def __init__(self):
-        self.ast_analyzer = ASTAnalyzer()
         self.tracer = ExecutionTracer()
 
     def analyze(self, source):
-        return self.ast_analyzer.analyze(source)
+        analyzer = ASTAnalyzer(source)
+        return analyzer.analyze()
 
     def run(self, source, filename="<string>"):
         analysis = self.analyze(source)
