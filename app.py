@@ -101,13 +101,13 @@ if run_program:
                 del st.session_state.execution_step_slider
 
         except Exception as error:
-
             tracer.stop()
-
-            st.error(f"Program error: {error}")
-
-            st.session_state.user_history = []
-            st.session_state.selected_step = 1
+            st.error("program execution failed.")
+            st.subheader("Error Details")
+            st.write(f"**Error Type:**'{type(error).__name__}'")
+            st.write(f"**Error Message:**{error}")
+            st.session_state.user_history=[]
+            st.session_state.selected_step=1
 
 # Get Execution History
 
