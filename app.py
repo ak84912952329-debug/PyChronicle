@@ -10,15 +10,15 @@ st.set_page_config(
 
 st.title("PyChronicle")
 st.subheader("AST-Powered Time-Travel Debugger")
+# Session State
 
-
-# Store execution history
 if "user_history" not in st.session_state:
     st.session_state.user_history = []
 
 if "selected_step" not in st.session_state:
     st.session_state.selected_step = 1
 
+# Source Code Input
 
 source_code = st.text_area(
     "Enter Python Code",
@@ -31,6 +31,7 @@ print(z)
     height=250
 )
 
+# Program Controls
 
 col1, col2 = st.columns(2)
 
@@ -40,9 +41,10 @@ with col1:
 with col2:
     clear_results = st.button("Clear Results")
 
+# Clear Results
 
-# Clear results
 if clear_results:
+
     st.session_state.user_history = []
     st.session_state.selected_step = 1
 
@@ -51,17 +53,20 @@ if clear_results:
 
     st.rerun()
 
+# Run Program
 
-# Run program
 if run_program:
 
     if not source_code.strip():
+
         st.warning("Please enter some Python code.")
 
     else:
+
         tracer = ExecutionTracer()
 
         try:
+
             namespace = {}
 
             compiled_code = compile(
@@ -85,11 +90,13 @@ if run_program:
                 if state.function == "<module>"
             ]
 
+            # Save execution history
             st.session_state.user_history = user_history
 
-            # Start from first step
+            # Start navigation from first step
             st.session_state.selected_step = 1
 
+            # Reset slider widget
             if "execution_step_slider" in st.session_state:
                 del st.session_state.execution_step_slider
 
@@ -102,8 +109,8 @@ if run_program:
             st.session_state.user_history = []
             st.session_state.selected_step = 1
 
+# Get Execution History
 
-# Get history
 user_history = st.session_state.user_history
 
 
@@ -111,27 +118,29 @@ if user_history:
 
     total_steps = len(user_history)
 
+    # Validate Selected Step
 
-    # Make sure selected step is valid
     if st.session_state.selected_step < 1:
         st.session_state.selected_step = 1
 
     if st.session_state.selected_step > total_steps:
         st.session_state.selected_step = total_steps
 
+    # Execution Summary
 
-    # Execution summary
     st.subheader("Execution Summary")
 
     col1, col2 = st.columns(2)
 
     with col1:
+
         st.metric(
             "Total Steps",
             total_steps
         )
 
     with col2:
+
         st.metric(
             "Variables Captured",
             len([
@@ -141,8 +150,8 @@ if user_history:
             ])
         )
 
+    # Final Variable State
 
-    # Final variable state
     st.subheader("Final Variable State")
 
     final_variables = {
@@ -153,10 +162,26 @@ if user_history:
 
     st.write(final_variables)
 
+    # Step Navigation
 
-    # Step navigation
     st.subheader("Step Navigation")
 
+    # Execution Progress
+
+    progress = (
+        st.session_state.selected_step / total_steps
+    )
+
+    st.progress(
+        progress,
+        text=(
+            f"Execution Progress: "
+            f"Step {st.session_state.selected_step} "
+            f"of {total_steps}"
+        )
+    )
+
+    # Previous / Current / Next
 
     col1, col2, col3 = st.columns(3)
 
@@ -169,11 +194,6 @@ if user_history:
         ):
 
             st.session_state.selected_step -= 1
-
-            # Update slider state
-            st.session_state.execution_step_slider = (
-                st.session_state.selected_step
-            )
 
             st.rerun()
 
@@ -196,35 +216,27 @@ if user_history:
 
             st.session_state.selected_step += 1
 
-            # Update slider state
-            st.session_state.execution_step_slider = (
-                st.session_state.selected_step
-            )
-
             st.rerun()
+    # Step Slider
 
-
-    # Step slider
     selected_step = st.slider(
         "Select execution step",
         min_value=1,
         max_value=total_steps,
-        value=st.session_state.selected_step,
-        key="execution_step_slider"
+        value=st.session_state.selected_step
     )
 
-
-    # Save slider selection
+    # Update selected step
     st.session_state.selected_step = selected_step
 
+    # Selected State
 
-    # Selected state
     selected_state = user_history[
         st.session_state.selected_step - 1
     ]
 
+    # Selected Step Details
 
-    # Selected step details
     st.write(
         f"### Step {selected_state.step}"
     )
@@ -237,13 +249,14 @@ if user_history:
         f"**Function:** `{selected_state.function}`"
     )
 
+    # Source Code
 
     st.write("**Source Code:**")
 
     st.code(selected_state.source)
 
+    # Variables at Selected Step
 
-    # Variables at selected step
     selected_variables = {
         name: value
         for name, value in selected_state.variables.items()
@@ -254,19 +267,34 @@ if user_history:
 
     st.write(selected_variables)
 
+    # Complete Execution History
 
-    # Complete execution history
     st.subheader("Execution History")
+
 
     for state in user_history:
 
+        # Highlight current step
+        if state.step == st.session_state.selected_step:
+
+            st.success(
+                f"Currently Viewing — Step {state.step}"
+            )
+
+        else:
+
+            st.write(
+                f"**Step {state.step}**"
+            )
+
+
         st.write(
-            f"**Step {state.step}** | "
             f"Line {state.line} | "
             f"Function: `{state.function}`"
         )
 
         st.code(state.source)
+
 
         user_variables = {
             name: value
@@ -274,7 +302,10 @@ if user_history:
             if name != "__builtins__"
         }
 
-        st.write("Variables:", user_variables)
+        st.write(
+            "Variables:",
+            user_variables
+        )
 
         st.divider()
 
