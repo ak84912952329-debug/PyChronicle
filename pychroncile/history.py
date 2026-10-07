@@ -8,6 +8,8 @@ class ExecutionState:
     function: str
     source: str
     variables: dict
+    event: str = "line"
+    error: dict = None
 
 
 class History:
