@@ -87,7 +87,7 @@ if run_program:
             st.session_state.user_history = []
 
 
-# Display previous execution results
+# Display execution results
 user_history = st.session_state.user_history
 
 
@@ -125,7 +125,45 @@ if user_history:
 
     st.write(final_variables)
 
-    # Execution history
+    # Step navigation
+    st.subheader("Step Navigation")
+
+    selected_step = st.slider(
+        "Select execution step",
+        min_value=1,
+        max_value=len(user_history),
+        value=len(user_history)
+    )
+
+    selected_state = user_history[selected_step - 1]
+
+    st.write(
+        f"### Step {selected_state.step}"
+    )
+
+    st.write(
+        f"**Line:** {selected_state.line}"
+    )
+
+    st.write(
+        f"**Function:** `{selected_state.function}`"
+    )
+
+    st.write("**Source Code:**")
+
+    st.code(selected_state.source)
+
+    selected_variables = {
+        name: value
+        for name, value in selected_state.variables.items()
+        if name != "__builtins__"
+    }
+
+    st.write("**Variables at this step:**")
+
+    st.write(selected_variables)
+
+    # Complete execution history
     st.subheader("Execution History")
 
     for state in user_history:
