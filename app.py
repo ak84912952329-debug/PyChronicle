@@ -11,6 +11,7 @@ st.set_page_config(
 st.title("PyChronicle")
 st.subheader("AST-Powered Time-Travel Debugger")
 
+
 source_code = st.text_area(
     "Enter Python Code",
     """x = 10
@@ -48,32 +49,54 @@ if st.button("Run Program"):
 
             st.success("Program executed successfully.")
 
-# Remove internal tracer states
+            # Remove internal tracer states
             user_history = [
                 state for state in tracer.history
                 if state.function == "<module>"
-]
+            ]
 
-# Execution summary
+            # Execution summary
             st.subheader("Execution Summary")
 
             col1, col2 = st.columns(2)
 
             with col1:
-                st.metric("Total Steps", len(user_history))
+                st.metric(
+                    "Total Steps",
+                    len(user_history)
+                )
 
             with col2:
                 st.metric(
                     "Variables Captured",
-            len([name for name in user_history[-1].variables
-                 if name!= "__builtins__"])
+                    len([
+                        name
+                        for name in user_history[-1].variables
+                        if name != "__builtins__"
+                    ])
                     if user_history
                     else 0
-    )
+                )
 
+            # Final variable state
+            st.subheader("Final Variable State")
+
+            if user_history:
+                final_variables = {
+                    name: value
+                    for name, value in user_history[-1].variables.items()
+                    if name != "__builtins__"
+                }
+
+                st.write(final_variables)
+
+            else:
+                st.info("No variables were captured.")
+
+            # Execution history
             st.subheader("Execution History")
 
-            for state in user_history: 
+            for state in user_history:
 
                 st.write(
                     f"**Step {state.step}** | "
@@ -83,12 +106,14 @@ if st.button("Run Program"):
 
                 st.code(state.source)
 
-                user_variables={
-                    name: Value
+                user_variables = {
+                    name: value
                     for name, value in state.variables.items()
-                    if name!="__builtins__"
+                    if name != "__builtins__"
                 }
-                st.write("variables:",user_variables)
+
+                st.write("Variables:", user_variables)
+
                 st.divider()
 
         except Exception as error:
