@@ -4,14 +4,17 @@ from pychronicle.engine import PyChronicle
 def main():
     source_file = "examples/sample.py"
 
-    debugger = PyChronicle(source_file)
+    with open(source_file, "r", encoding="utf-8") as f:
+        source = f.read()
+
+    debugger = PyChronicle()
 
     print("=" * 55)
     print("       PyChronicle - Time-Travel Debugger")
     print("=" * 55)
 
     # AST Analysis
-    statements = debugger.analyze_source()
+    statements = debugger.analyze(source)
 
     print("\nAST Analysis")
     print("-" * 30)
@@ -19,16 +22,18 @@ def main():
 
     for statement in statements:
         print(
-            f"Line {statement['line']}: "
-            f"{statement['type']}"
+            f"Line {statement.line}: "
+            f"{statement.kind} - {statement.source}"
         )
 
-    # Run program and record execution states
+    # Run program
     print("\nProgram Output")
     print("-" * 30)
 
-    history = debugger.run()
+    result = debugger.run(source, source_file)
+    history = result["history"]
 
+    # Execution History
     print("\nExecution History")
     print("-" * 30)
 
@@ -40,7 +45,32 @@ def main():
         )
         print(f"Variables: {state.variables}")
 
-    # Time-travel navigation
+    # Function tracking
+    print("\nFunction Events")
+    print("-" * 30)
+
+    for event in result["function_events"]:
+        print(
+            f"{event['type'].upper()} | "
+            f"{event['function']} | "
+            f"Line {event['line']}"
+        )
+
+    # Error tracking
+    print("\nErrors")
+    print("-" * 30)
+
+    if result["errors"]:
+        for error in result["errors"]:
+            print(
+                f"{error['type']} | "
+                f"Line {error['line']} | "
+                f"{error['message']}"
+            )
+    else:
+        print("No errors detected.")
+
+    # Navigation
     print("\nTime-Travel Navigation")
     print("-" * 30)
 
