@@ -29,7 +29,7 @@ Python Source Code
         ↓
  Execution History
         ↓
- Previous / Next Steps
+ Previous / Next Step
         ↓
   Streamlit Interface
         ↓
