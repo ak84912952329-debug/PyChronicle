@@ -1,41 +1,38 @@
-
-import runpy
-import sys
-
 from .ast_analyzer import ASTAnalyzer
 from .tracer import ExecutionTracer
-from .history import History
 
 
 class PyChronicle:
-    def __init__(self, source_file):
-        self.source_file = source_file
-        self.history = History()
+    def __init__(self):
+        self.ast_analyzer = ASTAnalyzer()
+        self.tracer = ExecutionTracer()
 
-    def analyze_source(self):
-        with open(self.source_file, "r", encoding="utf-8") as file:
-            source_code = file.read()
+    def analyze(self, source):
+        return self.ast_analyzer.analyze(source)
 
-        analyzer = ASTAnalyzer(source_code)
-        return analyzer.analyze()
+    def run(self, source, filename="<string>"):
+        analysis = self.analyze(source)
 
-    def run(self):
-        tracer = ExecutionTracer()
-
-        tracer.start()
+        self.tracer.start()
 
         try:
-            runpy.run_path(self.source_file, run_name="__main__")
+            code = compile(source, filename, "exec")
+            exec(code, {})
         finally:
-            tracer.stop()
+            self.tracer.stop()
 
-        for state in tracer.history:
-            self.history.add(state)
-
-        return self.history
-
-    def summary(self):
         return {
-            "source_file": self.source_file,
-            "execution_states": len(self.history),
+            "analysis": analysis,
+            "history": self.tracer.get_history(),
+            "function_events": self.tracer.get_function_events(),
+            "errors": self.tracer.get_errors()
         }
+
+    def get_history(self):
+        return self.tracer.get_history()
+
+    def get_function_events(self):
+        return self.tracer.get_function_events()
+
+    def get_errors(self):
+        return self.tracer.get_errors()
