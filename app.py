@@ -1,6 +1,6 @@
 import streamlit as st
 
-from tracer import ExecutionTracer
+from pychronicle.tracer import ExecutionTracer
 
 
 st.set_page_config(
@@ -48,9 +48,32 @@ if st.button("Run Program"):
 
             st.success("Program executed successfully.")
 
+# Remove internal tracer states
+            user_history = [
+                state for state in tracer.history
+                if state.function == "<module>"
+]
+
+# Execution summary
+            st.subheader("Execution Summary")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.metric("Total Steps", len(user_history))
+
+            with col2:
+                st.metric(
+                    "Variables Captured",
+            len([name for name in user_history[-1].variables
+                 if name!= "__builtins__"])
+                    if user_history
+                    else 0
+    )
+
             st.subheader("Execution History")
 
-            for state in tracer.history:
+            for state in user_history: 
 
                 st.write(
                     f"**Step {state.step}** | "
@@ -60,8 +83,12 @@ if st.button("Run Program"):
 
                 st.code(state.source)
 
-                st.write("Variables:", state.variables)
-
+                user_variables={
+                    name: Value
+                    for name, value in state.variables.items()
+                    if name!="__builtins__"
+                }
+                st.write("variables:",user_variables)
                 st.divider()
 
         except Exception as error:
