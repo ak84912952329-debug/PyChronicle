@@ -12,6 +12,11 @@ st.title("PyChronicle")
 st.subheader("AST-Powered Time-Travel Debugger")
 
 
+# Store execution history in session state
+if "user_history" not in st.session_state:
+    st.session_state.user_history = []
+
+
 source_code = st.text_area(
     "Enter Python Code",
     """x = 10
@@ -24,7 +29,22 @@ print(z)
 )
 
 
-if st.button("Run Program"):
+col1, col2 = st.columns(2)
+
+with col1:
+    run_program = st.button("Run Program")
+
+with col2:
+    clear_results = st.button("Clear Results")
+
+
+# Clear previous results
+if clear_results:
+    st.session_state.user_history = []
+    st.rerun()
+
+
+if run_program:
 
     if not source_code.strip():
         st.warning("Please enter some Python code.")
@@ -55,69 +75,78 @@ if st.button("Run Program"):
                 if state.function == "<module>"
             ]
 
-            # Execution summary
-            st.subheader("Execution Summary")
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.metric(
-                    "Total Steps",
-                    len(user_history)
-                )
-
-            with col2:
-                st.metric(
-                    "Variables Captured",
-                    len([
-                        name
-                        for name in user_history[-1].variables
-                        if name != "__builtins__"
-                    ])
-                    if user_history
-                    else 0
-                )
-
-            # Final variable state
-            st.subheader("Final Variable State")
-
-            if user_history:
-                final_variables = {
-                    name: value
-                    for name, value in user_history[-1].variables.items()
-                    if name != "__builtins__"
-                }
-
-                st.write(final_variables)
-
-            else:
-                st.info("No variables were captured.")
-
-            # Execution history
-            st.subheader("Execution History")
-
-            for state in user_history:
-
-                st.write(
-                    f"**Step {state.step}** | "
-                    f"Line {state.line} | "
-                    f"Function: `{state.function}`"
-                )
-
-                st.code(state.source)
-
-                user_variables = {
-                    name: value
-                    for name, value in state.variables.items()
-                    if name != "__builtins__"
-                }
-
-                st.write("Variables:", user_variables)
-
-                st.divider()
+            # Save history in session state
+            st.session_state.user_history = user_history
 
         except Exception as error:
 
             tracer.stop()
 
             st.error(f"Program error: {error}")
+
+            st.session_state.user_history = []
+
+
+# Display previous execution results
+user_history = st.session_state.user_history
+
+
+if user_history:
+
+    # Execution summary
+    st.subheader("Execution Summary")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric(
+            "Total Steps",
+            len(user_history)
+        )
+
+    with col2:
+        st.metric(
+            "Variables Captured",
+            len([
+                name
+                for name in user_history[-1].variables
+                if name != "__builtins__"
+            ])
+        )
+
+    # Final variable state
+    st.subheader("Final Variable State")
+
+    final_variables = {
+        name: value
+        for name, value in user_history[-1].variables.items()
+        if name != "__builtins__"
+    }
+
+    st.write(final_variables)
+
+    # Execution history
+    st.subheader("Execution History")
+
+    for state in user_history:
+
+        st.write(
+            f"**Step {state.step}** | "
+            f"Line {state.line} | "
+            f"Function: `{state.function}`"
+        )
+
+        st.code(state.source)
+
+        user_variables = {
+            name: value
+            for name, value in state.variables.items()
+            if name != "__builtins__"
+        }
+
+        st.write("Variables:", user_variables)
+
+        st.divider()
+
+else:
+    st.info("No execution results available.")
